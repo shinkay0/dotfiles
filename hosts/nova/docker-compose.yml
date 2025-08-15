@@ -1,0 +1,82 @@
+services:
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    networks: [webnet]
+
+  registry:
+    image: registry:2
+    environment:
+      - REGISTRY_HTTP_ADDR=0.0.0.0:5000
+      - REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY=/var/lib/registry
+    volumes:
+      - ./registry:/var/lib/registry
+      - ./registry/auth:/auth
+    restart: unless-stopped
+    networks: [webnet]
+    expose:
+      - "5000"
+
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:12.0.1
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - FORGEJO__server__ROOT_URL=https://git.shacorp.fr/
+      - FORGEJO__server__HTTP_PORT=3000
+      - FORGEJO__server__DOMAIN=git.shacorp.fr
+    restart: unless-stopped
+    volumes:
+      - ./forgejo:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3000:3000"
+      - "222:22"
+    networks: [webnet]
+    depends_on:
+      - db
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    restart: always
+    expose:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=${N8N_HOST}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://${N8N_HOST}
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n/local_files:/files
+    networks: [webnet]
+
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=forgejo
+      - POSTGRES_PASSWORD=${FORGEJO_DB_PASSWORD}
+      - POSTGRES_DB=forgejo
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks: [webnet]
+
+volumes:
+  caddy_data: {}
+  caddy_config: {}
+  n8n_data: {}
+
+networks:
+  webnet: {driver: bridge}

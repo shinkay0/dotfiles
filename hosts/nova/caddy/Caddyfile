@@ -1,0 +1,33 @@
+http://registry.shacorp.fr {
+    redir https://registry.shacorp.fr{uri}
+}
+
+http://git.shacorp.fr {
+    redir https://git.shacorp.fr{uri}
+}
+
+http://n8n.shacorp.fr {
+    redir https://n8n.shacorp.fr{uri}
+}
+
+http://ci.shacorp.fr {
+    redir https://woodpecker.shacorp.fr{uri}
+}
+
+registry.shacorp.fr {
+    reverse_proxy registry:5000
+
+    respond / 200
+}
+
+git.shacorp.fr {
+    reverse_proxy forgejo:3000
+}
+
+n8n.shacorp.fr {
+    reverse_proxy n8n:5678
+}
+
+ci.shacorp.fr {
+    reverse_proxy woodpecker-server:8000
+}
