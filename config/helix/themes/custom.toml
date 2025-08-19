@@ -1,0 +1,5 @@
+inherits = "solarized_light"
+
+"ui.background" = {}
+"ui.statusline" = {}
+"ui.linenr" = {}

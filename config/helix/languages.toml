@@ -1,0 +1,30 @@
+[[language]]
+name = "yaml"
+language-servers = ["yaml-ls"]
+
+[language-server.yaml-ls]
+command = "yaml-language-server"
+args = ["--stdio"]
+
+# YAML LS settings (use real TOML tables instead of multi-line inline tables)
+[language-server.yaml-ls.config.yaml]
+validate = true
+hover = true
+completion = true
+
+[language-server.yaml-ls.config.yaml.format]
+enable = true
+
+[language-server.yaml-ls.config.yaml.schemaStore]
+enable = true
+
+# Tell the server which files should use the built-in Kubernetes schema
+[language-server.yaml-ls.config.yaml.schemas]
+kubernetes = [
+  "**/k8s/**/*.yaml",
+  "**/*.k8s.yaml",
+  "**/*deployment*.yaml",
+  "**/*service*.yaml",
+  "**/*ingress*.yaml",
+  "**/*job*.yaml",
+]

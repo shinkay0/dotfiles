@@ -1,0 +1,27 @@
+theme = "custom"
+
+[editor]
+bufferline = "multiple"
+cursorline = true
+line-number = "relative"
+rulers = [120]
+true-color = true
+
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[editor.indent-guides]
+character = "╎"
+render = true
+
+[editor.lsp]
+# Disable automatically popups of signature parameter help
+auto-signature-help = false
+# Show LSP messages in the status line
+display-messages = true
+
+[editor.statusline]
+left = ["mode", "spinner", "version-control", "file-name"]
